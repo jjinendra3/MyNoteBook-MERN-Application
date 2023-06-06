@@ -4,12 +4,13 @@
   "description": "mynotebook - Your anywhere Notebook!",
   "main": "index.js",
   "scripts": {
-    " serve" : "nodemon server.js " 
+    " serve": "nodemon server.js "
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
+    "express-validator": "^7.0.1",
     "mongoose": "^7.2.2"
   },
   "devDependencies": {
