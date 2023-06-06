@@ -1,18 +1,19 @@
-const mongoose=require('mongoose');
+const ConnecttoMongoDB=require('./db')
 const express = require('express');
-const mongoURI="mongodb://0.0.0.0:27017/mynotebook";
-const ConnecttoMongoDB=()=>{
-    mongoose.connect(mongoURI).then(()=>{
-        console.log("Sucess!");
-    })
-}
+
 ConnecttoMongoDB();
 const app = express()
 const port = 3000
+//used to get content from the user.....
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+// Available Routes
+app.use('/api/auth',require('./routes/auth'));
+
+app.use('/api/notes',require('./routes/notes'));
+// app.get('/', (req, res) => {
+//   res.send('Hello World!')
+// })
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:3000`)
