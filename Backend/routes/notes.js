@@ -3,8 +3,8 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator"); //used whenever we want to take input from the user
 const fetchuser = require("../middleware/fetchuser");
 const Notes = require("../models/Notes");
-const fetchnotes = require("../middleware/fetchnotes");
-
+//const fetchnotes = require("../middleware/fetchnotes");
+//fetchhnotes will be used when id of note is fiven in header, primarily was used in ROUTE 3 (UPDATING NOTE)
 //ROUTE 1: TO FETCH THE NOTES OF THE USER, LOGIN REWUIRED, GET REQ
 //This will  use get as it will be easier here to use get instead of post.
 router.get("/fetchnotes", fetchuser, async (req, res) => {
@@ -51,17 +51,17 @@ router.post(
   }
 );
 
-
 //ROUTE 3:Updating User's notes through POST req '/api/notes/updatenote', login required
 
 // An advantage of using put is because using the same endpoint we can do multiple things like /update/note/:id with post can do a different function
-router.put("/updatenote/:id", fetchuser, fetchnotes, async (req, res) => {
+router.put("/updatenote/:id", fetchuser, async (req, res) => {
   try {
     //here /:id is not required but an easy way to get the id instead of getting it as a header using fetchuser.
-    if (req.note.user.toString() !== req.user.id) {
+    const Note = await Notes.findById(req.params.id);
+    if (Note.user.toString() !== req.user.id) {
       //Checks whether the change maker is actually the notemaker client.
       return res.status(900).send("Invalid User!");
-    } //req.note comes from fetchnotes, req.user comes from fetchuser
+    } //req.user comes from fetchuser
     const newnote = {}; //Creates a new json
     const { title, description, tag } = req.body; // this is the input we take from the user as body, it is destructured
 
@@ -76,7 +76,7 @@ router.put("/updatenote/:id", fetchuser, fetchnotes, async (req, res) => {
       newnote.tag = tag; // the tag passed by client is now the tag of newnote
     }
     const updatedNotes = await Notes.findByIdAndUpdate(
-      req.note.id,
+      Note.id,
       { $set: newnote },
       { new: true }
     );
@@ -90,7 +90,6 @@ router.put("/updatenote/:id", fetchuser, fetchnotes, async (req, res) => {
     res.status(500).send("There is an error while updating the note.");
   }
 });
-
 
 //ROUTE 4: DELETING A NOTE MADE BY USER. USING DELETE REQ '/api/notes/deletenote' LOGIN WILL BE REQUIRED
 router.delete("/deletenote/:id", fetchuser, async (req, res) => {

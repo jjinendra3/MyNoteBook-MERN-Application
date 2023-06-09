@@ -1,10 +1,12 @@
 const ConnecttoMongoDB = require("./db");
 const express = require("express");
+var cors=require('cors');
 
 ConnecttoMongoDB();
 const app = express();
 const port = 5000; //React will run on 3000
 //used to get content from the user.....
+app.use(cors());
 app.use(express.json());
 
 // Available Routes
@@ -16,5 +18,5 @@ app.use("/api/notes", require("./routes/notes"));
 // })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:5000`);
+  console.log(`mynotebook listening on port http://localhost:5000`);
 });
