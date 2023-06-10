@@ -2,55 +2,73 @@ import React from "react";
 import { useState } from "react";
 import noteContext from "./noteContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 const NoteState = (props) => {
   const notesInit = [];
+  let navigate = useNavigate();
   const fetcher = () => {
-    axios
-      .get("http://localhost:5000/api/notes/fetchnotes", {
-        headers: {
-          "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MDI1OTE2NTNmODI0YTc2N2YxYzAyIn0sImlhdCI6MTY4NjI1NDk5M30.CU6HY9fFzaQm4wjST36gIQDVOyWy6qzL-wuYkBR6_LA",
-        },
-      })
-      .then((response) => {
-        setnotes(response.data);
-      });
+    if (localStorage.getItem("token") !== "null") {
+      axios
+        .get("http://localhost:5000/api/notes/fetchnotes", {
+          headers: {
+            "auth-token": localStorage.getItem("token"),
+          },
+        })
+        .then((response) => {
+          setnotes(response.data);
+        });
+    } else {
+      props.alert("Please Login to continue.", "error");
+      navigate("/login");
+    }
   };
   const addNote = (title, description, tag) => {
-    if (tag === "") {
-      axios.post(
-        "http://localhost:5000/api/notes/addnote",
-        { title, description },
-        {
-          headers: {
-            "auth-token":
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MDI1OTE2NTNmODI0YTc2N2YxYzAyIn0sImlhdCI6MTY4NjMwNzg1MX0.7Q9unmwvOcimnE0IzK3iuQV0ghQnDwQqXzRzSopuFYI",
-          },
-        }
-      );
+    if (localStorage.getItem("token") !== "null") {
+      if (tag === "") {
+        axios
+          .post(
+            "http://localhost:5000/api/notes/addnote",
+            { title, description },
+            {
+              headers: {
+                "auth-token": localStorage.getItem("token"),
+              },
+            }
+          )
+          .then(() => {
+            props.alert("Note added succesfully.", "success");
+          });
+      } else {
+        axios
+          .post(
+            "http://localhost:5000/api/notes/addnote",
+            { title, description, tag },
+            {
+              headers: {
+                "auth-token": localStorage.getItem("token"),
+              },
+            }
+          )
+          .then(() => {
+            props.alert("Note added succesfully.", "success");
+          });
+      }
     } else {
-      axios.post(
-        "http://localhost:5000/api/notes/addnote",
-        { title, description, tag },
-        {
-          headers: {
-            "auth-token":
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MDI1OTE2NTNmODI0YTc2N2YxYzAyIn0sImlhdCI6MTY4NjMwNzg1MX0.7Q9unmwvOcimnE0IzK3iuQV0ghQnDwQqXzRzSopuFYI",
-          },
-        }
-      );
+      props.alert("Please Login to continue.", "error");
+      navigate("/login");
     }
   };
   const deleteNote = (id) => {
     axios
       .delete(`http://localhost:5000/api/notes/deletenote/${id}`, {
         headers: {
-          "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MDI1OTE2NTNmODI0YTc2N2YxYzAyIn0sImlhdCI6MTY4NjMwNzg1MX0.7Q9unmwvOcimnE0IzK3iuQV0ghQnDwQqXzRzSopuFYI",
+          "auth-token": localStorage.getItem("token"),
         },
       })
       .then(() => {
         fetcher();
+        props.alert("Note deleted succesfully.", "success");
       });
   };
 
@@ -61,13 +79,14 @@ const NoteState = (props) => {
         { title, description, tag },
         {
           headers: {
-            "auth-token":
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MDI1OTE2NTNmODI0YTc2N2YxYzAyIn0sImlhdCI6MTY4NjMwNzg1MX0.7Q9unmwvOcimnE0IzK3iuQV0ghQnDwQqXzRzSopuFYI",
+            "auth-token": localStorage.getItem("token"),
+            "note-id": id,
           },
         }
       )
       .then(() => {
         fetcher();
+        props.alert("Note updated succesfully.", "success");
       });
   };
   const [notes, setnotes] = useState(notesInit);

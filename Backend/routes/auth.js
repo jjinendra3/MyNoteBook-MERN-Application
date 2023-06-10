@@ -29,16 +29,18 @@ router.post(
     const errors = validationResult(req); //validates the input
     if (!errors.isEmpty()) {
       //checks the input for errors
-      return res.status(400).json({ errors: errors.array() });
+      let s = false;
+      return res.status(400).json({ s, errors: errors.array() });
     } //if error found
 
     try {
       let user = await User.findOne({ email: req.body.email }); //finding if the email provided exists
 
       if (user) {
+        let s = false;
         return res
           .status(400)
-          .json({ error: "A user with this email already exists!" });
+          .json({ s, error: "A user with this email already exists!" });
       } //used to generate readable error on lack of unique email id
 
       const salt = await bcrypt.genSalt(10); //Generation of Salt to be added to the pw
@@ -64,11 +66,14 @@ router.post(
         },
       };
       const AuthToken = jwt.sign(data, JWT_KEY); // so the jwt is creted by mixing the id of entry, the secret key and is converted to token which is unique for all the users.... Remarkable Technology!!
-
-      res.json({ AuthToken }); // a jwt is processed which is unique for all the user
+      let s = true;
+      res.json({ s, AuthToken }); // a jwt is processed which is unique for all the user
     } catch (error) {
+      let s = false;
       console.error(error.message); // Any error apart from the specific email thing
-      res.status(500).send("There is an error while creating user");
+      res
+        .status(500)
+        .json({ s, error: "There is an error while creating user" });
     }
   }
 );
@@ -84,23 +89,26 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req); //validates the input
     if (!errors.isEmpty()) {
+      let s = false;
       //checks the input for errors
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ s, errors: errors.array() });
     } //returns the inputs with errors, dowsnt bother the server.
     const { email, password } = req.body; //this is just destructuring the elements of req.body to avoid writing req.body again and again, now email and password can be used as a variable as it is.
     try {
       let user = await User.findOne({ email });
       if (!user) {
+        let s = false;
         return res
           .status(401)
-          .json({ error: "Please enter correct credentials!" });
+          .json({ s, error: "Please enter correct credentials!" });
       }
       let passCheck = await bcrypt.compare(password, user.password);
 
       if (!passCheck) {
+        let s = false;
         return res
           .status(401)
-          .json({ error: "Please enter correct credentials!" });
+          .json({ s, error: "Please enter correct credentials!" });
       }
       const data = {
         //if you have come here it means that you have succesfully giventhe correct credentials.
@@ -111,10 +119,14 @@ router.post(
         },
       };
       const AuthToken = jwt.sign(data, JWT_KEY);
-      res.json({ AuthToken }); // will send the jwt of the user we logged in, should be the same that was genrated when we created the client's account!
+      let s = true;
+      res.json({ s, AuthToken }); // will send the jwt of the user we logged in, should be the same that was genrated when we created the client's account!
     } catch (error) {
-      console.error(error.message); // Any generalized error if there is
-      res.status(500).send("There is an error while logging in");
+      let s = false;
+      console.error(error.message); // Any error apart from the specific email thing
+      res
+        .status(500)
+        .json({ s, error: "There is an error while creating user" });
     }
   }
 );
@@ -126,10 +138,12 @@ router.post("/getuser", fetchuser, async (req, res) => {
   try {
     const userId = req.user.id; //the userid given by fetchuser
     const user = await User.findById(userId).select("-password"); //taking the entire details except password
-    res.send(user); // sending as response to the client
+    let s = true;
+    res.json({ s, user }); // sending as response to the client
   } catch (error) {
-    console.error(error.message); // Any generalized error if there is
-    res.status(500).send("There is an error while fetching user details");
+    let s = false;
+    console.error(error.message); // Any error apart from the specific email thing
+    res.status(500).json({ s, error: "There is an error while creating user" });
   }
 });
 

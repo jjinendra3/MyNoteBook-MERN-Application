@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-const Navbar = () => {
+import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+const Navbar = (props) => {
+  let navigate = useNavigate();
   let location = useLocation(); //react router dom hook
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -43,7 +44,26 @@ const Navbar = () => {
               </Link>
             </li>
           </ul>
-          <button className="btn btn-outline-primary">Enable Dark Mode</button>
+          {localStorage.getItem("token") === "null" && (
+            <Link className="btn mx-2" to="/login">
+              <i className="fa-solid fa-user"></i>
+            </Link>
+          )}
+          {localStorage.getItem("token") !== "null" && (
+            <button
+              className="btn mx-2"
+              onClick={() => {
+                localStorage.setItem("token", null);
+                props.alert("Signed Out Succesfully", "success");
+
+                navigate("/login");
+              }}
+            >
+              <i className="fa-solid fa-right-from-bracket"></i>
+            </button>
+          )}
+
+          {/* <button className="btn btn-outline-primary mx-2">Enable Dark Mode</button> */}
         </div>
       </div>
     </nav>
