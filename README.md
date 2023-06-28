@@ -18,6 +18,7 @@ Clone the repository and type 'npm run both' on powershell to start the app.
 - Frontend: ReactJS
 - Backend: Node.js, Express.js
 - Database: MongoDB
+- ReactJS: Use of Axios, react-router-dom, POST,PUT,DELETE,GET and various hooks.
 - Authentication: JWT (JSON Web Tokens)
 - Encryption: Salt-pepper encryption
 
