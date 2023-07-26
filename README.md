@@ -22,7 +22,7 @@ Clone the repository and type 'npm run both' on powershell to start the app.
 - Authentication: JWT (JSON Web Tokens)
 - Encryption: Salt-pepper encryption
 
-##Project Status
+## Project Status
 
 This project is now complete.
 
